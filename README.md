@@ -1,4 +1,4 @@
-# EDA Capstone Project: Online Retail Sales
+# EDA Capstone Project: Online Retail Sales using python
 
 Exploratory data analysis of a UK-based online retailer's transactions (01 Dec 2010 to 09 Dec 2011). The project looks at **when** customers buy, **what** sells best and **where** revenue comes from.
 
