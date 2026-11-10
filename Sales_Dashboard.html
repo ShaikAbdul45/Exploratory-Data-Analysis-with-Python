@@ -1,0 +1,44 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>Online Retail Sales Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{--bg:#f3f6fa;--card:#fff;--text:#1b2733;--mute:#6b7a89;--line:#e1e8ef;--p:#1F4E79;--a:#E07B39;--warn:#fff3cd;--warnt:#6b5200;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1720;--card:#18232f;--text:#e8eef4;--mute:#93a3b3;--line:#27384a;--p:#6fa8dc;--a:#f0a066;--warn:#3a3112;--warnt:#f5dd8a;color-scheme:dark}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+header{background:var(--p);color:#fff;padding:22px 28px}header h1{margin:0;font-size:22px}header p{margin:4px 0 0;opacity:.85;font-size:13px}
+main{max-width:1240px;margin:0 auto;padding:20px 20px 40px}
+.warn{background:var(--warn);color:var(--warnt);border-radius:8px;padding:10px 14px;margin-bottom:16px;font-size:13px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px;margin-bottom:16px}
+.kpi,.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px}
+.kpi span{display:block;color:var(--mute);font-size:12px;text-transform:uppercase;letter-spacing:.05em}.kpi b{display:block;font-size:24px;margin-top:6px;color:var(--p)}
+.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:14px}.s7{grid-column:span 7}.s5{grid-column:span 5}.s6{grid-column:span 6}.s12{grid-column:span 12}
+.card h2{margin:0 0 10px;font-size:14px}.box{position:relative;height:280px}
+ul{margin:0;padding-left:18px;line-height:1.9;font-size:14px}.note{color:var(--mute);font-size:12px;margin-top:14px}
+@media(max-width:860px){.s7,.s5,.s6{grid-column:span 12}}
+</style></head><body>
+<header><h1>Online Retail Sales Dashboard</h1><p id="range"></p></header>
+<main><div id="warn"></div><div class="kpis" id="kpis"></div>
+<div class="grid">
+<div class="card s7"><h2>Monthly revenue (GBP)</h2><div class="box"><canvas id="c1"></canvas></div></div>
+<div class="card s5"><h2>Revenue by country (top 8)</h2><div class="box"><canvas id="c2"></canvas></div></div>
+<div class="card s12"><h2>Top 10 products by revenue (GBP)</h2><div class="box"><canvas id="c3"></canvas></div></div>
+<div class="card s6"><h2>Orders by weekday</h2><div class="box"><canvas id="c4"></canvas></div></div>
+<div class="card s6"><h2>Orders by hour</h2><div class="box"><canvas id="c5"></canvas></div></div>
+<div class="card s12"><h2>Key insights</h2><ul id="ins"></ul></div></div>
+<p class="note" id="note"></p></main>
+<script>
+const D={"sample": true, "range": "2010-12-01 to 2011-12-09", "partial": true, "kpi": [["Total revenue", "GBP 1,066,119"], ["Orders", "5,196"], ["Customers", "2,046"], ["Avg order value", "GBP 205"], ["Products", "320"], ["Countries", "14"]], "monthly": [["2010-12", "2011-01", "2011-02", "2011-03", "2011-04", "2011-05", "2011-06", "2011-07", "2011-08", "2011-09", "2011-10", "2011-11", "2011-12 *"], [129074, 51911, 59031, 58643, 48417, 52045, 56864, 69407, 69892, 115612, 153452, 162091, 39680]], "products": [["WHITE STORAGE CUSHION", "METAL STORAGE TRAY", "GLASS KITCHEN DECORATION", "BLUE CANDLE TIN", "BLUE CHRISTMAS SIGN", "MINI GARDEN DECORATION", "PAPER CHRISTMAS BUNTING", "HEART MUG BUNTING", "HEART TEA TIN", "WHITE CAKE BOX"], [64076, 42206, 34347, 33209, 29579, 27991, 25529, 23814, 22495, 22463]], "countries": [["United Kingdom", "Germany", "EIRE", "France", "Portugal", "Spain", "Switzerland", "Netherlands"], [927508, 30000, 28923, 26918, 11467, 9914, 8261, 7589]], "weekday": [["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Sunday"], [830, 869, 920, 873, 855, 849]], "hour": [["8:00", "9:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00"], [321, 311, 516, 672, 823, 767, 626, 496, 333, 185, 97, 28, 21]], "insights": ["Peak month: 2011-11 (GBP 162,091)", "Top product: WHITE STORAGE CUSHION", "United Kingdom = 87% of revenue; top export market: Germany", "Busiest day: Wednesday, busiest hour: 12:00", "Top 20% of customers = 60% of identified revenue", "Cancellations: 1.9% of lines; missing CustomerID: 24.7%"]};const cs=getComputedStyle(document.documentElement);const v=n=>cs.getPropertyValue(n).trim();
+document.getElementById("range").textContent="Transactions "+D.range;
+if(D.sample)document.getElementById("warn").innerHTML='<div class="warn"><b>Sample data:</b> figures are synthetic and illustrative. Replace the dataset and re-run the notebook for real results.</div>';
+document.getElementById("kpis").innerHTML=D.kpi.map(k=>'<div class="kpi"><span>'+k[0]+'</span><b>'+k[1]+'</b></div>').join("");
+document.getElementById("ins").innerHTML=D.insights.map(i=>"<li></li>").join("");
+document.querySelectorAll("#ins li").forEach((li,i)=>li.textContent=D.insights[i]);
+document.getElementById("note").textContent=D.partial?"* The final month is incomplete. Revenue excludes cancellations and non-product codes.":"Revenue excludes cancellations and non-product codes.";
+Chart.defaults.color=v("--mute");Chart.defaults.font.family="Inter,Segoe UI,Roboto,Arial,sans-serif";
+const grid={color:v("--line")};const fmt=x=>x>=1000?(x/1000).toFixed(0)+"k":x;
+const mk=(id,type,d,o={})=>new Chart(document.getElementById(id),{type,data:{labels:d[0],datasets:[{data:d[1],backgroundColor:o.bg||v("--p"),borderColor:o.bc||v("--p"),borderWidth:o.bw||0,fill:o.fill||false,tension:.3,borderRadius:4}]},
+options:{responsive:true,maintainAspectRatio:false,indexAxis:o.axis||"x",plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{callback:o.axis?fmt:undefined}},y:{grid,ticks:{callback:o.axis?undefined:fmt}}}}});
+mk("c1","line",D.monthly,{bg:v("--p")+"22",bc:v("--p"),bw:3,fill:true});
+mk("c2","bar",D.countries,{axis:"y",bg:v("--a")});
+mk("c3","bar",D.products,{axis:"y"});mk("c4","bar",D.weekday);mk("c5","bar",D.hour,{bg:v("--a")});
+</script></body></html>
